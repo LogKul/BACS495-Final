@@ -9,22 +9,22 @@ class Footer extends React.Component {
                 <div className='Footer-child'>
                     <ul>
                         <li>Footer Stuff</li>
-                        <li>Footer Stuff</li>
-                        <li>Footer Stuff</li>
+                        <li>Footer LLC</li>
+                        <li>2022-2022</li>
                     </ul>
                 </div>
                 <div className='Footer-child'>
                     <ul>
-                        <li>Footer Stuff</li>
-                        <li>Footer Stuff</li>
-                        <li>Footer Stuff</li>
+                        <li>More Footer Stuff</li>
+                        <li>Publiched by Footers</li>
+                        <li>Footer.com</li>
                     </ul>
                 </div>
                 <div className='Footer-child'>
                     <ul>
-                        <li>Footer Stuff</li>
-                        <li>Footer Stuff</li>
-                        <li>Footer Stuff</li>
+                        <li>Conditions of Use</li>
+                        <li>Privacy Notice</li>
+                        <li>Etc</li>
                     </ul>
                 </div>
             </div>
