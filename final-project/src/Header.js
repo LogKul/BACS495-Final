@@ -11,7 +11,7 @@ class Header extends React.Component {
                 <div className="headerContent">
                     <div className='flexPropHeader'></div>
                     <div className="flexHeader"><h1>[ Header ]</h1></div>
-                    <div className='flexProfile'>Welcome, USER!<img src={pfp} className='pfp' alt='pfp'></img></div>
+                    <div className='flexProfile'>Welcome, new user! <button>Sign in</button>{/*<img src={pfp} className='pfp' alt='pfp'></img>*/}</div>
                 </div>
 
                 <div className="nav_container">
