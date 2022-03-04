@@ -4,11 +4,6 @@ const { ObjectId, ObjectID } = require('mongodb');
 var router = express.Router();
 
 
-/* GET users listing. */
-router.get('/', function (req, res, next) {
-  res.send('Base student path. Nothing here.');
-});
-
 router.get('/', function (req, res, next) {
   var db = req.app.locals.db;
   const query = { _id: ObjectID(req.body.id) };

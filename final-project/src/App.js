@@ -1,6 +1,6 @@
 import logo from './images/DK_Tri.png';
 import './App.css';
-import Header from './Header.js';
+//const { ObjectId, ObjectID } = require('mongodb');
 import Footer from './Footer.js';
 import React from 'react';
 
@@ -8,13 +8,30 @@ class App extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { clicked: "NOT CLICKED" };
+    this.state = {
+      clicked: "NOT CLICKED",
+      dbdata: "Null"
+    };
   }
 
   handleClick() {
-    this.setState({
-      clicked: "CLICKED"
-    });
+    const options = {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ "id": "62115b7b27b423cd7b94bd80" })
+    };
+
+    fetch("http://localhost:3400/users/", options)
+      .then(response => response.json())
+      .then(data => this.setState({ clicked: "CLICKED", dbdata: "some" }))
+      .catch((error) => {
+        console.error(error);
+      });
+
+    //this.setState({
+    //  clicked: "CLICKED",
+    //  dbdata: data.name
+    //});
   }
 
   render() {
@@ -49,6 +66,7 @@ class App extends React.Component {
             This is where the posts would be
             <br></br>
             <p>Status is: {this.state.clicked}</p>
+            <p>Info from DB connection: {this.state.dbdata}</p>
             <br></br>
             <br></br>
             <br></br>
