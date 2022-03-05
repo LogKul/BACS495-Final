@@ -91,9 +91,12 @@ class App extends React.Component {
             This is where class navigation would be
           </div>
           <div className='App-child-maincontent App-child'>
+
             This is where the posts would be
+
             <br></br>
             <br></br>
+
             <form onSubmit={this.handleLoginSubmit} className='Loginform'>
               <label>
                 Username:
@@ -107,15 +110,32 @@ class App extends React.Component {
               <br></br>
               <input type="submit" value="Sign In" />
             </form>
+
             <br></br>
             <br></br>
+
             <div className="Testbox">
               <p>Login State: {this.state.login}</p>
               <p>Info from API: {this.state.api_response}</p>
             </div>
+
+            <br></br>
+            <br></br>
+
+            <div className="Infotestbox">
+              <p>Here are 2 accounts to test with:</p>
+              <br></br>
+              <p>Username: larryspringus123</p>
+              <p>Password: password1</p>
+              <br></br>
+              <p>Username: jimbocrusher</p>
+              <p>Password: creg4lyfe</p>
+            </div>
+
             <br></br>
             <br></br>
             <br></br>
+
             <img src={logo} className="App-logo" alt="logo" />
             <p>
               DK Spin as Placeholder
