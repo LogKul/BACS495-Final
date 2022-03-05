@@ -171,3 +171,23 @@
 .flexPropHeader {
   width: 8.6%;
 }
+
+/* Temporary Login Formatting */
+.Loginform {
+  background-color: aqua;
+  border: black 2px solid;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  width: 75%;
+  margin: auto;
+}
+
+.Testbox {
+  background-color: lightsalmon;
+  border: black 2px solid;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  width: 75%;
+  margin: auto;
+  overflow-wrap: break-word;
+}

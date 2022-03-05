@@ -5,7 +5,7 @@ import './index.css';
 class Footer extends React.Component {
     render() {
         return (
-            <div class='Footer-container'>
+            <div className='Footer-container'>
                 <div className='Footer-child'>
                     <ul>
                         <li>Footer Stuff</li>
