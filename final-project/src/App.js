@@ -39,7 +39,7 @@ class App extends React.Component {
       }
     };
 
-    axios.get("http://localhost:3400/users/", config)
+    axios.get(process.env.REACT_APP_API_URL, config)
       .then((response) => {
         console.log(response.data)
         console.log(response.status)
