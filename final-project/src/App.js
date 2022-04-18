@@ -3,7 +3,6 @@ import './App.css';
 //const { ObjectId, ObjectID } = require('mongodb');deploy
 import Footer from './Footer.js';
 import React from 'react';
-import axios from "axios";
 
 class App extends React.Component {
 
@@ -14,11 +13,23 @@ class App extends React.Component {
       password: "",
       login: "Try logging in!",
       api_response: "null",
+      signup_username: "",
+      signup_password: "",
+      signup_password2: "",
+      signup_fname: "",
+      signup_lname: "",
+      signup_result: "",
     };
 
     this.handleUNChange = this.handleUNChange.bind(this);
     this.handlePWChange = this.handlePWChange.bind(this);
+    this.handleSUUNChange = this.handleSUUNChange.bind(this);
+    this.handleSUPW1Change = this.handleSUPW1Change.bind(this);
+    this.handleSUPW2Change = this.handleSUPW2Change.bind(this);
+    this.handleFNameChange = this.handleFNameChange.bind(this);
+    this.handleLNameChange = this.handleLNameChange.bind(this);
     this.handleLoginSubmit = this.handleLoginSubmit.bind(this);
+    this.handleSignUpSubmit = this.handleSignUpSubmit.bind(this);
   }
 
   handleUNChange(event) {
@@ -29,34 +40,78 @@ class App extends React.Component {
     this.setState({ password: event.target.value });
   }
 
-  handleLoginSubmit(event) {
-    event.preventDefault();
+  handleSUUNChange(event) {
+    this.setState({ signup_username: event.target.value });
+  }
 
-    const config = {
-      params: {
-        uname: this.state.username,
-        password: this.state.password,
-      }
+  handleSUPW1Change(event) {
+    this.setState({ signup_password: event.target.value });
+  }
+
+  handleSUPW2Change(event) {
+    this.setState({ signup_password2: event.target.value });
+  }
+
+  handleFNameChange(event) {
+    this.setState({ signup_fname: event.target.value });
+  }
+
+  handleLNameChange(event) {
+    this.setState({ signup_lname: event.target.value });
+  }
+
+  handleLoginSubmit(event) {
+    /*event.preventDefault();*/
+
+    var config = {
+      'uname': this.state.username,
+      'password': this.state.password,
     };
 
-    axios.get(process.env.REACT_APP_API_URL, config)
-      .then((response) => {
-        console.log(response.data)
-        console.log(response.status)
-        console.log(response.statusText)
+    fetch(process.env.REACT_APP_API_URL + "/users/" + this.state.username + "/" + this.state.password)
+      .then(response => response.json())
+      .then(data => {
+        console.log(data)
 
-        if (response.data !== null) {
+        if (data !== null) {
           this.setState({
             login: "Successfully logged in!",
-            api_response: JSON.stringify(response),
+            api_response: JSON.stringify(data),
           });
         }
         else {
           this.setState({
             login: "Try again.",
-            api_response: JSON.stringify(response),
+            api_response: JSON.stringify(data),
           });
         }
+      });
+  }
+
+  handleSignUpSubmit(event) {
+    event.preventDefault();
+
+    var config = {
+      'uname': this.state.signup_username,
+      'password': this.state.signup_password,
+      'fname': this.state.signup_fname,
+      'lname': this.state.signup_lname,
+    };
+
+    fetch(process.env.REACT_APP_API_URL + "/users",
+      {
+        method: 'POST',
+        body: JSON.stringify(config),
+        headers: {
+          "Content-Type": "application/json; charset=utf-8",
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log(data)
+        this.setState({
+          signup_result: data.msg,
+        });
       });
   }
 
@@ -94,10 +149,27 @@ class App extends React.Component {
 
             This is where the posts would be
 
+
+
+            <br></br>
+            <br></br>
+            <br></br>
+
+            <img src={logo} className="App-logo" alt="logo" />
+            <p>
+              DK Spin as Placeholder
+            </p>
+          </div>
+          <div className='App-child-somethingelse App-child'>
+            Maybe some options/settings/actions over here? Or it could be a news section.
+
             <br></br>
             <br></br>
 
             <form onSubmit={this.handleLoginSubmit} className='Loginform'>
+              Login
+              <br></br>
+              <br></br>
               <label>
                 Username:
                 <input type="text" value={this.state.username} onChange={this.handleUNChange} />
@@ -134,15 +206,41 @@ class App extends React.Component {
 
             <br></br>
             <br></br>
-            <br></br>
 
-            <img src={logo} className="App-logo" alt="logo" />
-            <p>
-              DK Spin as Placeholder
-            </p>
-          </div>
-          <div className='App-child-somethingelse App-child'>
-            Maybe some options/settings/actions over here? Or it could be a news section.
+            <form onSubmit={this.handleSignUpSubmit} className='Loginform'>
+              Sign Up
+              <br></br>
+              <br></br>
+              <label>
+                Username:
+                <input type="text" value={this.state.signup_username} onChange={this.handleSUUNChange} />
+              </label>
+              <br></br>
+              <label>
+                Password:
+                <input type="text" value={this.state.signup_password} onChange={this.handleSUPW1Change} />
+              </label>
+              <br></br>
+              <label>
+                Re-Enter Password:
+                <input type="text" value={this.state.signup_password2} onChange={this.handleSUPW2Change} />
+              </label>
+              <br></br>
+              <label>
+                First Name:
+                <input type="text" value={this.state.signup_fname} onChange={this.handleFNameChange} />
+              </label>
+              <br></br>
+              <label>
+                Last Name:
+                <input type="text" value={this.state.signup_lname} onChange={this.handleLNameChange} />
+              </label>
+              <br></br>
+              <p>
+                Sign Up Result: {this.state.signup_result}
+              </p>
+              <input type="submit" value="Sign Up" />
+            </form>
           </div>
         </div>
         <Footer />

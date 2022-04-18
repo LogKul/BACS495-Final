@@ -4,10 +4,21 @@ const { ObjectId, ObjectID } = require('mongodb');
 var router = express.Router();
 
 
-router.get('/', function (req, res, next) {
+router.get('/:uname/:password', function (req, res, next) {
+  const query = {
+    "uname": req.params.uname,
+    "password": req.params.password
+  };
   var db = req.app.locals.db;
-  const query = { uname: req.query.uname, password: req.query.password };
-  db.collection("users").findOne(query).then(function (result) { /*res.send(req.query.id)*/res.json(result) });
+  db.collection("users")
+    .findOne(query)
+    .then(result => {
+      console.log('Retrieved user: ${result}');
+      res.json(result);
+    })
+    .catch(err => {
+      console.log('Error: ${err}');
+    });
 });
 
 router.put('/', function (req, res, next) {
@@ -25,12 +36,38 @@ router.put('/', function (req, res, next) {
 
 router.post('/', function (req, res, next) {
   const user = {
-    "name": req.body.name,
-    "type": req.body.type
-  }
+    "fname": req.body.fname,
+    "lname": req.body.lname,
+    "password": req.body.password,
+    "uname": req.body.uname,
+  };
   var db = req.app.locals.db;
-  db.collection("users").insertOne(user);
-  res.send("User inserted");
+
+  db.collection("users")
+    .findOne({ "uname": req.body.uname })
+    .then(result => {
+
+      if (result !== null) {
+        res.json({ "msg": "Username taken." })
+      }
+      else {
+        db.collection("users")
+          .insertOne(user);
+        res.json({ "msg": "Account created." });
+      }
+    })
+    .catch(err => {
+      console.log('Error: ' + err);
+    });
+
+  /*db.collection("users")
+    .insertOne(user)
+    .then(result => {
+      res.json(result)
+    })
+    .catch(err => {
+      console.log('Error: ${err}');
+    });*/
 });
 
 router.delete('/', function (req, res, next) {

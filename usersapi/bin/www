@@ -8,6 +8,7 @@ var app = require('../app');
 var debug = require('debug')('usersapi:server');
 var http = require('http');
 var MongoClient = require('mongodb').MongoClient;
+require('dotenv').config();
 
 
 /**
@@ -23,7 +24,7 @@ app.set('port', port);
  */
 
 /* logan, X7JagcafHPTpii9q */
-MongoClient.connect("mongodb+srv://logan:X7JagcafHPTpii9q@schoolforumcluster.i3hzm.mongodb.net/usersdb?retryWrites=true&w=majority", function (err, client) {
+MongoClient.connect(process.env.DB, function (err, client) {
   if (err) throw err;
   db = client.db("usersdb");
   app.locals.db = db;
