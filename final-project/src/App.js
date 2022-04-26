@@ -36,6 +36,15 @@ class App extends React.Component {
     this.handleSignUpSubmit = this.handleSignUpSubmit.bind(this);
     this.handleQuestionSubmit = this.handleQuestionSubmit.bind(this);
     this.handleQuestionRefresh = this.handleQuestionRefresh.bind(this);
+
+    fetch(process.env.REACT_APP_API_URL + "/questions/all")
+      .then(response => response.json())
+      .then(data => {
+        console.log(data)
+        this.setState({
+          questions: data,
+        });
+      });
   }
 
   handleUNChange(event) {
@@ -151,6 +160,15 @@ class App extends React.Component {
             question_result: data.msg,
           });
         });
+
+      fetch(process.env.REACT_APP_API_URL + "/questions/all")
+        .then(response => response.json())
+        .then(data => {
+          console.log(data)
+          this.setState({
+            questions: data,
+          });
+        });
     }
     else {
       this.setState({
@@ -204,33 +222,28 @@ class App extends React.Component {
           </div>
           <div className='App-child-maincontent App-child'>
 
-            <form onSubmit={this.handleQuestionSubmit} className=''>
+            <form onSubmit={this.handleQuestionSubmit} className='question_input'>
+              <p>Submit a Question:</p>
               <label>
-                Submit a Question:
-                <input type="textarea" value={this.state.question_input} onChange={this.handleQuestionChange} />
+                <input type="textarea" placeholder='Type question here!' value={this.state.question_input} onChange={this.handleQuestionChange} className='question_input_area' />
               </label>
+              <br></br>
               <input type="submit" value="Submit" />
             </form>
             <p>{this.state.question_result}</p>
             <hr></hr>
 
             <br></br>
-            <br></br>
-            <br></br>
 
             {this.state.questions.map(q =>
-              <div key={q.id}>
-                Posted by {q.uname}
-                {q.question} {q.text}
-                Upvotes: {q.upvotes}
+              <div key={q._id} className='question'>
+                <p className='question_author'>Posted by {q.uname}</p>
+                <p className='question_text'>{q.question} {q.text}</p>
+                <p className='question_votes'>Upvotes: {q.upvotes}</p>
                 <button>Upvote</button>
               </div>)
             }
 
-            <img src={logo} className="App-logo" alt="logo" />
-            <p>
-              DK Spin as Placeholder
-            </p>
           </div>
           <div className='App-child-somethingelse App-child'>
             Maybe some options/settings/actions over here? Or it could be a news section.

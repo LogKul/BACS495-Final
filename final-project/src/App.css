@@ -58,12 +58,13 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
 }
 
-.Header{
+.Header {
   color: rgb(255, 255, 255);
   background-color: rgb(51, 0, 68);
   text-align: center;
@@ -86,65 +87,71 @@
   line-height: 40px;
 }
 
-.Footer-child > ul {
+.Footer-child>ul {
   list-style-type: none;
 }
 
 /* HEADER NAV CLASSES */
 .nav_container {
-    display: flex;
-    width: 100%;
-    height: 72px;
-    background-color: rgb(51, 0, 68);
-    flex-wrap: nowrap;
-    justify-content: center;
-    align-items: center;
-    gap: 12px;
+  display: flex;
+  width: 100%;
+  height: 72px;
+  background-color: rgb(51, 0, 68);
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
 }
+
 .flex_content {
-    background-color: rgb(229, 204, 205);
-    text-align: center;
-    font-size: 16pt;
-    font-weight: bold;
-    color: black;
-    width: 15%;
-    height: 48px;
-    line-height: 48px;
-    border-radius: 8px;
-    transition: all 100ms ease-in-out;
-    user-select: none;
+  background-color: rgb(229, 204, 205);
+  text-align: center;
+  font-size: 16pt;
+  font-weight: bold;
+  color: black;
+  width: 15%;
+  height: 48px;
+  line-height: 48px;
+  border-radius: 8px;
+  transition: all 100ms ease-in-out;
+  user-select: none;
 }
+
 .flex_current {
-    background-color: rgb(255, 255, 255);
-    border: solid 4px red;
-    text-align: center;
-    font-size: 18pt;
-    font-weight: bold;
-    width: 15%;
-    height: 48px;
-    line-height: 40px;
-    border-radius: 8px;
-    transition: all 100ms ease-in-out;
+  background-color: rgb(255, 255, 255);
+  border: solid 4px red;
+  text-align: center;
+  font-size: 18pt;
+  font-weight: bold;
+  width: 15%;
+  height: 48px;
+  line-height: 40px;
+  border-radius: 8px;
+  transition: all 100ms ease-in-out;
 }
+
 .flex_content:hover {
-    transform: scale(1.05, 1.10);
-    background-color: red;
-    color: white;
-    cursor: pointer;
+  transform: scale(1.05, 1.10);
+  background-color: red;
+  color: white;
+  cursor: pointer;
 }
+
 .flex_current:hover {
-    transform: scale(1.05, 1.10);
-    background-color: red;
-    color: white;
-    cursor: pointer;
+  transform: scale(1.05, 1.10);
+  background-color: red;
+  color: white;
+  cursor: pointer;
 }
+
 .flex_content:active {
-    background-color: white;
-    color: black;
+  background-color: white;
+  color: black;
 }
+
 .flex_current:active {
-    background-color: white;
-    color: black;
+  background-color: white;
+  color: black;
 }
 
 /* PFP and Header testing classes */
@@ -200,4 +207,44 @@
   width: 75%;
   margin: auto;
   overflow-wrap: break-word;
+}
+
+/* QUESTION CLASSES */
+.question_input {
+  text-align: left;
+  margin-left: 5%;
+}
+
+.question_input_area {
+  height: 100px;
+  width: 92%;
+  resize: none;
+}
+
+.question {
+  text-align: left;
+  border: solid black 2px;
+  line-height: 0px;
+  padding: 6%;
+  border-radius: 4%;
+  background-color: purple;
+  color: white;
+  width: 70%;
+  margin: auto;
+  margin-bottom: 10px;
+}
+
+.question_text {
+  font-size: 24px;
+  line-height: 24px;
+}
+
+.question_author {
+  font-size: 12px;
+  font-style: italic;
+}
+
+.question_votes {
+  font-size: 12px;
+  font-style: oblique;
 }
