@@ -19,6 +19,9 @@ class App extends React.Component {
       signup_fname: "",
       signup_lname: "",
       signup_result: "",
+      question_input: "",
+      question_result: "",
+      questions: [],
     };
 
     this.handleUNChange = this.handleUNChange.bind(this);
@@ -28,8 +31,11 @@ class App extends React.Component {
     this.handleSUPW2Change = this.handleSUPW2Change.bind(this);
     this.handleFNameChange = this.handleFNameChange.bind(this);
     this.handleLNameChange = this.handleLNameChange.bind(this);
+    this.handleQuestionChange = this.handleQuestionChange.bind(this);
     this.handleLoginSubmit = this.handleLoginSubmit.bind(this);
     this.handleSignUpSubmit = this.handleSignUpSubmit.bind(this);
+    this.handleQuestionSubmit = this.handleQuestionSubmit.bind(this);
+    this.handleQuestionRefresh = this.handleQuestionRefresh.bind(this);
   }
 
   handleUNChange(event) {
@@ -60,8 +66,12 @@ class App extends React.Component {
     this.setState({ signup_lname: event.target.value });
   }
 
+  handleQuestionChange(event) {
+    this.setState({ question_input: event.target.value });
+  }
+
   handleLoginSubmit(event) {
-    /*event.preventDefault();*/
+    event.preventDefault();
 
     var config = {
       'uname': this.state.username,
@@ -115,6 +125,53 @@ class App extends React.Component {
       });
   }
 
+  handleQuestionSubmit(event) {
+    event.preventDefault();
+
+    var config = {
+      'uname': this.state.username,
+      'question_text': this.state.question_input,
+      'upvotes': 0,
+      'downvotes': 0,
+    };
+
+    if (this.state.username !== "") {
+      fetch(process.env.REACT_APP_API_URL + "/questions",
+        {
+          method: 'POST',
+          body: JSON.stringify(config),
+          headers: {
+            "Content-Type": "application/json; charset=utf-8",
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          console.log(data)
+          this.setState({
+            question_result: data.msg,
+          });
+        });
+    }
+    else {
+      this.setState({
+        question_result: 'Must be logged in.',
+      });
+    }
+  }
+
+  handleQuestionRefresh(event) {
+    event.preventDefault();
+
+    fetch(process.env.REACT_APP_API_URL + "/questions/all")
+      .then(response => response.json())
+      .then(data => {
+        console.log(data)
+        this.setState({
+          questions: data,
+        });
+      });
+  }
+
 
 
   render() {
@@ -147,13 +204,28 @@ class App extends React.Component {
           </div>
           <div className='App-child-maincontent App-child'>
 
-            This is where the posts would be
-
-
+            <form onSubmit={this.handleQuestionSubmit} className=''>
+              <label>
+                Submit a Question:
+                <input type="textarea" value={this.state.question_input} onChange={this.handleQuestionChange} />
+              </label>
+              <input type="submit" value="Submit" />
+            </form>
+            <p>{this.state.question_result}</p>
+            <hr></hr>
 
             <br></br>
             <br></br>
             <br></br>
+
+            {this.state.questions.map(q =>
+              <div key={q.id}>
+                Posted by {q.uname}
+                {q.question} {q.text}
+                Upvotes: {q.upvotes}
+                <button>Upvote</button>
+              </div>)
+            }
 
             <img src={logo} className="App-logo" alt="logo" />
             <p>
