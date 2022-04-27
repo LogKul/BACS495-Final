@@ -225,8 +225,8 @@
   text-align: left;
   border: solid black 2px;
   line-height: 0px;
-  padding: 6%;
-  border-radius: 4%;
+  padding: 2% 3%;
+  border-radius: 24px;
   background-color: purple;
   color: white;
   width: 70%;
@@ -235,16 +235,18 @@
 }
 
 .question_text {
-  font-size: 24px;
+  font-size: 24pt;
   line-height: 24px;
 }
 
 .question_author {
-  font-size: 12px;
+  font-size: 12pt;
   font-style: italic;
+  color: rgb(211, 190, 218)
 }
 
 .question_votes {
-  font-size: 12px;
+  font-size: 12pt;
   font-style: oblique;
+  color: rgb(211, 190, 218)
 }

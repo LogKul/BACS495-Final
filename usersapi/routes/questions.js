@@ -34,4 +34,18 @@ router.post('/', function (req, res, next) {
     });
 });
 
+router.patch('/upvote', function (req, res, next) {
+  const question = {
+    "_id": ObjectId(req.body.id),
+  };
+  var db = req.app.locals.db;
+
+  db.collection("questions")
+    .updateOne(question, { $set: { "upvotes": req.body.upvotes } }, { upsert: true })
+    .catch(err => {
+      console.log('Error: ' + err);
+    });
+  res.json({ "msg": "Question " + req.body.id + " now has " + req.body.upvotes + " upvotes." });
+});
+
 module.exports = router;

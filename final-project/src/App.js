@@ -36,6 +36,7 @@ class App extends React.Component {
     this.handleSignUpSubmit = this.handleSignUpSubmit.bind(this);
     this.handleQuestionSubmit = this.handleQuestionSubmit.bind(this);
     this.handleQuestionRefresh = this.handleQuestionRefresh.bind(this);
+    this.handleQuestionUpvote = this.handleQuestionUpvote.bind(this);
 
     fetch(process.env.REACT_APP_API_URL + "/questions/all")
       .then(response => response.json())
@@ -141,7 +142,6 @@ class App extends React.Component {
       'uname': this.state.username,
       'question_text': this.state.question_input,
       'upvotes': 0,
-      'downvotes': 0,
     };
 
     if (this.state.username !== "") {
@@ -190,6 +190,34 @@ class App extends React.Component {
       });
   }
 
+  handleQuestionUpvote(id, upvotes) {
+    var config = {
+      'id': id,
+      'upvotes': upvotes + 1,
+    }
+    fetch(process.env.REACT_APP_API_URL + "/questions/upvote",
+      {
+        method: 'PATCH',
+        body: JSON.stringify(config),
+        headers: {
+          "Content-Type": "application/json; charset=utf-8",
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log(data.msg)
+      });
+
+    fetch(process.env.REACT_APP_API_URL + "/questions/all")
+      .then(response => response.json())
+      .then(data => {
+        console.log(data)
+        this.setState({
+          questions: data,
+        });
+      });
+  }
+
 
 
   render() {
@@ -225,7 +253,7 @@ class App extends React.Component {
             <form onSubmit={this.handleQuestionSubmit} className='question_input'>
               <p>Submit a Question:</p>
               <label>
-                <input type="textarea" placeholder='Type question here!' value={this.state.question_input} onChange={this.handleQuestionChange} className='question_input_area' />
+                <textarea placeholder='Enter a question here!' value={this.state.question_input} onChange={this.handleQuestionChange} className='question_input_area'></textarea>
               </label>
               <br></br>
               <input type="submit" value="Submit" />
@@ -236,11 +264,13 @@ class App extends React.Component {
             <br></br>
 
             {this.state.questions.map(q =>
-              <div key={q._id} className='question'>
-                <p className='question_author'>Posted by {q.uname}</p>
-                <p className='question_text'>{q.question} {q.text}</p>
-                <p className='question_votes'>Upvotes: {q.upvotes}</p>
-                <button>Upvote</button>
+              <div>
+                <div key={q._id} className='question'>
+                  <p className='question_author'>Posted by {q.uname}</p>
+                  <p className='question_text'>{q.question} {q.text}</p>
+                  <p className='question_votes'>Upvotes: {q.upvotes}</p>
+                  <button value={q.upvotes} onClick={() => this.handleQuestionUpvote(q._id, q.upvotes)}>Upvote</button>
+                </div>
               </div>)
             }
 
