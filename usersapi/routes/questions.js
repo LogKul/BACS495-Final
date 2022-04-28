@@ -48,4 +48,38 @@ router.patch('/upvote', function (req, res, next) {
   res.json({ "msg": "Question " + req.body.id + " now has " + req.body.upvotes + " upvotes." });
 });
 
+router.delete('/user', function (req, res, next) {
+  const query = {
+    "uname": req.body.uname,
+  };
+  var db = req.app.locals.db;
+
+  db.collection("questions")
+    .deleteMany(query)
+    .then(result => {
+      res.json({ "msg": "All user posts deleted." })
+      console.log('All posts from user ' + req.body.uname + ' deleted.')
+    })
+    .catch(err => {
+      console.log('Error: ' + err);
+    });
+});
+
+router.delete('/text', function (req, res, next) {
+  const query = {
+    "text": req.body.text,
+  };
+  var db = req.app.locals.db;
+
+  db.collection("questions")
+    .deleteMany(query)
+    .then(result => {
+      res.json({ "msg": "All user posts deleted." })
+      console.log('All posts with text \'' + req.body.text + '\' deleted.')
+    })
+    .catch(err => {
+      console.log('Error: ' + err);
+    });
+});
+
 module.exports = router;
