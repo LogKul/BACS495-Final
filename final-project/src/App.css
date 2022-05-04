@@ -225,13 +225,15 @@
   text-align: left;
   border: solid black 2px;
   line-height: 0px;
-  padding: 2% 3%;
+  padding: 2% 0% 0% 0%;
   border-radius: 24px;
   background-color: purple;
   color: white;
   width: 70%;
   margin: auto;
   margin-bottom: 10px;
+  padding-left: 3%;
+  padding-right: 3%;
 }
 
 .question_text {
@@ -242,11 +244,68 @@
 .question_author {
   font-size: 12pt;
   font-style: italic;
-  color: rgb(211, 190, 218)
+  color: rgb(211, 190, 218);
 }
 
 .question_votes {
   font-size: 12pt;
   font-style: oblique;
-  color: rgb(211, 190, 218)
+  color: rgb(211, 190, 218);
+}
+
+.upvote_button {
+  background-color: green;
+  color: white;
+}
+
+.reply_button {
+  margin: auto;
+  width: 100%;
+  border-radius: 8px;
+  background-color: orange;
+}
+
+.reply_input {
+  margin: auto;
+  margin-bottom: 32px;
+}
+
+.reply_input_area {
+  height: 72px;
+  width: 70%;
+  resize: none;
+  margin: auto;
+}
+
+.reply {
+  text-align: left;
+  border: solid black 2px;
+  line-height: 0px;
+  padding: 2% 0% 0% 0%;
+  border-radius: 24px;
+  background-color: rgb(143, 0, 0);
+  color: white;
+  width: 40%;
+  margin-left: 50%;
+  margin-bottom: 10px;
+  padding: 2% 3%;
+}
+
+.reply_text {
+  font-size: 12pt;
+  line-height: 12px;
+  overflow-wrap: break-word;
+}
+
+.reply_author {
+  font-size: 10pt;
+  font-style: italic;
+  color: rgb(211, 190, 218);
+  overflow-wrap: break-word;
+}
+
+.reply_votes {
+  font-size: 10pt;
+  font-style: oblique;
+  color: rgb(211, 190, 218);
 }

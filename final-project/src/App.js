@@ -11,8 +11,7 @@ class App extends React.Component {
     this.state = {
       username: "",
       password: "",
-      login: "Try logging in!",
-      api_response: "null",
+      login: false,
       signup_username: "",
       signup_password: "",
       signup_password2: "",
@@ -22,6 +21,10 @@ class App extends React.Component {
       question_input: "",
       question_result: "",
       questions: [],
+      replies: [],
+      reply_click: false,
+      reply_input: "",
+      reply_question_id: "",
     };
 
     this.handleUNChange = this.handleUNChange.bind(this);
@@ -32,11 +35,15 @@ class App extends React.Component {
     this.handleFNameChange = this.handleFNameChange.bind(this);
     this.handleLNameChange = this.handleLNameChange.bind(this);
     this.handleQuestionChange = this.handleQuestionChange.bind(this);
+    this.handleReplyClick = this.handleReplyClick.bind(this);
     this.handleLoginSubmit = this.handleLoginSubmit.bind(this);
     this.handleSignUpSubmit = this.handleSignUpSubmit.bind(this);
     this.handleQuestionSubmit = this.handleQuestionSubmit.bind(this);
     this.handleQuestionRefresh = this.handleQuestionRefresh.bind(this);
     this.handleQuestionUpvote = this.handleQuestionUpvote.bind(this);
+    this.handleReplySubmit = this.handleReplySubmit.bind(this);
+    this.handleReplyChange = this.handleReplyChange.bind(this);
+    this.handleReplyUpvote = this.handleReplyUpvote.bind(this);
 
     fetch(process.env.REACT_APP_API_URL + "/questions/all")
       .then(response => response.json())
@@ -44,6 +51,15 @@ class App extends React.Component {
         console.log(data)
         this.setState({
           questions: data,
+        });
+      });
+
+    fetch(process.env.REACT_APP_API_URL + "/questions/replies/all")
+      .then(response => response.json())
+      .then(data => {
+        console.log(data)
+        this.setState({
+          replies: data,
         });
       });
   }
@@ -80,6 +96,31 @@ class App extends React.Component {
     this.setState({ question_input: event.target.value });
   }
 
+  handleReplyClick(qid) {
+    var val = "";
+    var polar = true;
+    if (this.state.reply_click === false) {
+      polar = true;
+      val = qid;
+    }
+    else if (this.state.reply_click === true && this.state.reply_question_id === qid) {
+      polar = false;
+      val = "";
+    }
+    else {
+      polar = true;
+      val = qid;
+    }
+    this.setState({
+      reply_click: polar,
+      reply_question_id: val,
+    });
+  }
+
+  handleReplyChange(event) {
+    this.setState({ reply_input: event.target.value });
+  }
+
   handleLoginSubmit(event) {
     event.preventDefault();
 
@@ -95,14 +136,12 @@ class App extends React.Component {
 
         if (data !== null) {
           this.setState({
-            login: "Successfully logged in!",
-            api_response: JSON.stringify(data),
+            login: true,
           });
         }
         else {
           this.setState({
-            login: "Try again.",
-            api_response: JSON.stringify(data),
+            login: false,
           });
         }
       });
@@ -144,7 +183,7 @@ class App extends React.Component {
       'upvotes': 0,
     };
 
-    if (this.state.username !== "") {
+    if (this.state.login === true) {
       fetch(process.env.REACT_APP_API_URL + "/questions",
         {
           method: 'POST',
@@ -188,6 +227,15 @@ class App extends React.Component {
           questions: data,
         });
       });
+
+    fetch(process.env.REACT_APP_API_URL + "/questions/replies/all")
+      .then(response => response.json())
+      .then(data => {
+        console.log(data)
+        this.setState({
+          replies: data,
+        });
+      });
   }
 
   handleQuestionUpvote(id, upvotes) {
@@ -218,6 +266,70 @@ class App extends React.Component {
       });
   }
 
+  handleReplyUpvote(id, upvotes) {
+    var config = {
+      'id': id,
+      'upvotes': upvotes + 1,
+    }
+    fetch(process.env.REACT_APP_API_URL + "/questions/reply/upvote",
+      {
+        method: 'PATCH',
+        body: JSON.stringify(config),
+        headers: {
+          "Content-Type": "application/json; charset=utf-8",
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log(data.msg)
+      });
+
+    fetch(process.env.REACT_APP_API_URL + "/questions/replies/all")
+      .then(response => response.json())
+      .then(data => {
+        console.log(data)
+        this.setState({
+          replies: data,
+        });
+      });
+  }
+
+  handleReplySubmit(event) {
+    event.preventDefault();
+
+    var config = {
+      'uname': this.state.username,
+      'reply_text': this.state.reply_input,
+      'upvotes': 0,
+      'qid': this.state.reply_question_id,
+    };
+
+    if (this.state.login === true) {
+      fetch(process.env.REACT_APP_API_URL + "/questions/reply",
+        {
+          method: 'POST',
+          body: JSON.stringify(config),
+          headers: {
+            "Content-Type": "application/json; charset=utf-8",
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          console.log(data)
+          this.setState({
+            question_result: data.msg,
+          });
+        });
+
+      this.handleQuestionRefresh();
+    }
+    else {
+      this.setState({
+        question_result: 'Must be logged in.',
+      });
+    }
+  }
+
 
 
   render() {
@@ -246,7 +358,14 @@ class App extends React.Component {
         </div>
         <div className="App-container">
           <div className='App-child-classnav App-child'>
-            This is where class navigation would be
+            {this.state.replies.map(r =>
+              <div className='question'>
+                <p className='question_author'>Posted by {r.uname}</p>
+                <p className='question_author'>QID: {r.qid}</p>
+                <p className='question_text'>{r.text}</p>
+                <p className='question_votes'>Upvotes: {r.upvotes}</p>
+              </div>
+            )}
           </div>
           <div className='App-child-maincontent App-child'>
 
@@ -267,10 +386,33 @@ class App extends React.Component {
               <div>
                 <div key={q._id} className='question'>
                   <p className='question_author'>Posted by {q.uname}</p>
+                  <p className='question_author'>QID: {q._id}</p>
                   <p className='question_text'>{q.question} {q.text}</p>
                   <p className='question_votes'>Upvotes: {q.upvotes}</p>
-                  <button value={q.upvotes} onClick={() => this.handleQuestionUpvote(q._id, q.upvotes)}>Upvote</button>
+                  <button className='upvote_button' value={q.upvotes} onClick={() => this.handleQuestionUpvote(q._id, q.upvotes)}>Upvote</button>
+                  <p></p>
+                  <button className='reply_button' onClick={() => this.handleReplyClick(q._id)}>Reply</button>
                 </div>
+                {(this.state.reply_click === true && this.state.reply_question_id === q._id && this.state.login === true) &&
+                  <div>
+                    <form onSubmit={this.handleReplySubmit} className='reply_input'>
+                      <label>
+                        <textarea placeholder='Enter a reply here!' value={this.state.reply_input} onChange={this.handleReplyChange} className='reply_input_area'></textarea>
+                      </label>
+                      <br></br>
+                      <input type="submit" value="Submit" />
+                    </form>
+                  </div>
+                }
+                {this.state.replies.map(r =>
+                  (r.qid === q._id) &&
+                  <div className='reply'>
+                    <p className='reply_author'>Reply from {r.uname}</p>
+                    <p className='reply_text'>{r.text}</p>
+                    <p className='reply_votes'>Upvotes: {r.upvotes}</p>
+                    <button className='upvote_button' value={r.upvotes} onClick={() => this.handleReplyUpvote(r._id, r.upvotes)}>Upvote</button>
+                  </div>
+                )}
               </div>)
             }
 
@@ -302,8 +444,7 @@ class App extends React.Component {
             <br></br>
 
             <div className="Testbox">
-              <p>Login State: {this.state.login}</p>
-              <p>Info from API: {this.state.api_response}</p>
+              <p>Login State: {this.state.login ? "Successfully logged in!" : "Not logged in."}</p>
             </div>
 
             <br></br>

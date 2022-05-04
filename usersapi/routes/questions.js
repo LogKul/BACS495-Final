@@ -82,4 +82,49 @@ router.delete('/text', function (req, res, next) {
     });
 });
 
+router.get('/replies/all', function (req, res, next) {
+  var db = req.app.locals.db;
+  var cursor = db.collection("replies").find();
+  cursor.toArray()
+    .then(result => {
+      res.json(result);
+    })
+    .catch(err => {
+      console.log('Error: ' + err);
+    });
+});
+
+router.post('/reply', function (req, res, next) {
+  const reply = {
+    "uname": req.body.uname,
+    "text": req.body.reply_text,
+    "upvotes": req.body.upvotes,
+    "qid": ObjectId(req.body.qid),
+  };
+  var db = req.app.locals.db;
+
+  db.collection("replies")
+    .insertOne(reply)
+    .then(result => {
+      res.json({ "msg": "Reply posted." })
+    })
+    .catch(err => {
+      console.log('Error: ' + err);
+    });
+});
+
+router.patch('/reply/upvote', function (req, res, next) {
+  const reply = {
+    "_id": ObjectId(req.body.id),
+  };
+  var db = req.app.locals.db;
+
+  db.collection("replies")
+    .updateOne(reply, { $set: { "upvotes": req.body.upvotes } }, { upsert: true })
+    .catch(err => {
+      console.log('Error: ' + err);
+    });
+  res.json({ "msg": "Reply " + req.body.id + " now has " + req.body.upvotes + " upvotes." });
+});
+
 module.exports = router;
