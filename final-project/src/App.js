@@ -1,6 +1,6 @@
 import logo from './images/DK_Tri.png';
 import './App.css';
-//const { ObjectId, ObjectID } = require('mongodb');deploy
+//const { ObjectId, ObjectID } = require('mongodb'); deploy
 import Footer from './Footer.js';
 import Header from './Header.js';
 import React from 'react';
@@ -18,11 +18,13 @@ class App extends React.Component {
       signup_password2: "",
       signup_fname: "",
       signup_lname: "",
-      signup_result: "",
+      signup_result: 0,
       question_input: "",
       question_result: "",
       questions: [],
       replies: [],
+      question_upvotes: [],
+      reply_upvotes: [],
       reply_click: false,
       reply_input: "",
       reply_question_id: "",
@@ -64,6 +66,25 @@ class App extends React.Component {
           replies: data,
         });
       });
+
+    fetch(process.env.REACT_APP_API_URL + "/questions/quserupvotes/" + this.state.username)
+      .then(response => response.json())
+      .then(data => {
+        console.log(data)
+        this.setState({
+          question_upvotes: data,
+        });
+      });
+
+    fetch(process.env.REACT_APP_API_URL + "/questions/ruserupvotes/" + this.state.username)
+      .then(response => response.json())
+      .then(data => {
+        console.log(data)
+        this.setState({
+          reply_upvotes: data,
+        });
+      });
+
   }
 
   handleUNChange(event) {
@@ -140,6 +161,24 @@ class App extends React.Component {
           this.setState({
             login: 2,
           });
+
+          fetch(process.env.REACT_APP_API_URL + "/questions/quserupvotes/" + this.state.username)
+            .then(response => response.json())
+            .then(data => {
+              console.log(data)
+              this.setState({
+                question_upvotes: data,
+              });
+            });
+
+          fetch(process.env.REACT_APP_API_URL + "/questions/ruserupvotes/" + this.state.username)
+            .then(response => response.json())
+            .then(data => {
+              console.log(data)
+              this.setState({
+                reply_upvotes: data,
+              });
+            });
         }
         else {
           this.setState({
@@ -159,21 +198,29 @@ class App extends React.Component {
       'lname': this.state.signup_lname,
     };
 
-    fetch(process.env.REACT_APP_API_URL + "/users",
-      {
-        method: 'POST',
-        body: JSON.stringify(config),
-        headers: {
-          "Content-Type": "application/json; charset=utf-8",
-        }
-      })
-      .then(response => response.json())
-      .then(data => {
-        console.log(data)
-        this.setState({
-          signup_result: data.msg,
+    if (this.state.signup_password === this.state.signup_password2) {
+      fetch(process.env.REACT_APP_API_URL + "/users",
+        {
+          method: 'POST',
+          body: JSON.stringify(config),
+          headers: {
+            "Content-Type": "application/json; charset=utf-8",
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          console.log(data)
+          this.setState({
+            signup_result: data.msg,
+          });
         });
+    }
+    else {
+      this.setState({
+        signup_result: 1,
       });
+    }
+
   }
 
   handleQuestionSubmit(event) {
@@ -259,16 +306,28 @@ class App extends React.Component {
       .then(response => response.json())
       .then(data => {
         console.log(data.msg);
-
-        fetch(process.env.REACT_APP_API_URL + "/questions/all")
-          .then(response2 => response2.json())
-          .then(data2 => {
-            this.setState({
-              questions: data2,
-            });
-            console.log("FUNNY");
-          });
       });
+
+    setTimeout(function () {
+      fetch(process.env.REACT_APP_API_URL + "/questions/all")
+        .then(response2 => response2.json())
+        .then(data2 => {
+          this.setState({
+            questions: data2,
+          });
+          console.log("-Getting questions-");
+        });
+
+      fetch(process.env.REACT_APP_API_URL + "/questions/quserupvotes/" + this.state.username)
+        .then(response => response.json())
+        .then(data => {
+          console.log(data)
+          this.setState({
+            question_upvotes: data,
+          });
+          console.log("-Getting question upvotes-");
+        });
+    }.bind(this), 120)
   }
 
   handleReplyUpvote(event) {
@@ -290,17 +349,29 @@ class App extends React.Component {
       .then(response => response.json())
       .then(data => {
         console.log(data.msg)
-
-        fetch(process.env.REACT_APP_API_URL + "/questions/replies/all")
-          .then(response2 => response2.json())
-          .then(data2 => {
-            console.log(data2)
-            this.setState({
-              replies: data2,
-            });
-            console.log("FUNNY2");
-          });
       });
+
+    setTimeout(function () {
+      fetch(process.env.REACT_APP_API_URL + "/questions/replies/all")
+        .then(response2 => response2.json())
+        .then(data2 => {
+          console.log(data2)
+          this.setState({
+            replies: data2,
+          });
+          console.log("-Getting Replies-");
+        });
+
+      fetch(process.env.REACT_APP_API_URL + "/questions/ruserupvotes/" + this.state.username)
+        .then(response => response.json())
+        .then(data => {
+          console.log(data)
+          this.setState({
+            reply_upvotes: data,
+          });
+          console.log("-Getting reply upvotes-");
+        });
+    }.bind(this), 120)
   }
 
   handleReplySubmit(event) {
@@ -386,11 +457,13 @@ class App extends React.Component {
               <div>
                 <div key={q._id} className='question'>
                   <p className='question_author'>Posted by {q.uname}</p>
-                  <p className='question_author'>QID: {q._id}</p>
                   <p className='question_text'>{q.question} {q.text}</p>
                   <p className='question_votes'>Upvotes: {q.upvotes}</p>
-                  {(this.state.login === 2) &&
-                    <button className='upvote_button' value={q._id} onClick={this.handleQuestionUpvote}>Upvote</button>
+                  {(!(this.state.question_upvotes.some(e => e._id === q._id)) && this.state.login === 2) &&
+                    <button style={{ 'background-color': 'green' }} className='upvote_button' value={q._id} onClick={this.handleQuestionUpvote}>Upvote</button>
+                  }
+                  {((this.state.question_upvotes.some(e => e._id === q._id)) && this.state.login === 2) &&
+                    <button disabled='true' style={{ 'background-color': 'gray' }} className='upvote_button' value={q._id} onClick={this.handleQuestionUpvote}>Upvote</button>
                   }
                   <p></p>
                   <button className='reply_button' onClick={() => this.handleReplyClick(q._id)}>Reply</button>
@@ -412,8 +485,11 @@ class App extends React.Component {
                     <p className='reply_author'>Reply from {r.uname}</p>
                     <p className='reply_text'>{r.text}</p>
                     <p className='reply_votes'>Upvotes: {r.upvotes}</p>
-                    {(this.state.login === 2) &&
-                      <button className='upvote_button' value={r._id} onClick={this.handleReplyUpvote}>Upvote</button>
+                    {(!(this.state.reply_upvotes.some(e => e._id === r._id)) && this.state.login === 2) &&
+                      <button style={{ 'background-color': 'green' }} className='upvote_button' value={r._id} onClick={this.handleReplyUpvote}>Upvote</button>
+                    }
+                    {((this.state.reply_upvotes.some(e => e._id === r._id)) && this.state.login === 2) &&
+                      <button disabled='true' style={{ 'background-color': 'gray' }} className='upvote_button' value={r._id} onClick={this.handleReplyUpvote}>Upvote</button>
                     }
                   </div>
                 )}
@@ -429,31 +505,23 @@ class App extends React.Component {
             {!(this.state.login === 2)
               ?
               <div>
-                {(this.state.login) === 1 &&
-                  <div>
-                    <div className='Testbox'>
-                      Login failed, try again.
-                      <br></br>
-                    </div>
-                    <br></br>
-                    <br></br>
-                  </div>
-                }
-
                 <form onSubmit={this.handleLoginSubmit} className='Loginform'>
                   Login
                   <br></br>
                   <br></br>
                   <label>
                     Username:
-                    <input type="text" value={this.state.username} onChange={this.handleUNChange} />
+                    <input className='input_line' type="text" value={this.state.username} onChange={this.handleUNChange} />
                   </label>
                   <br></br>
                   <label>
                     Password:
-                    <input type="password" value={this.state.password} onChange={this.handlePWChange} />
+                    <input className='input_line' type="password" value={this.state.password} onChange={this.handlePWChange} />
                   </label>
                   <br></br>
+                  {(this.state.login) === 1 &&
+                    <p style={{ color: 'red' }}>Login failed, try again.</p>
+                  }
                   <input type="submit" value="Sign In" />
                 </form>
 
@@ -466,32 +534,44 @@ class App extends React.Component {
                   <br></br>
                   <label>
                     Username:
-                    <input type="text" value={this.state.signup_username} onChange={this.handleSUUNChange} />
+                    <input className='input_line' type="text" value={this.state.signup_username} onChange={this.handleSUUNChange} />
                   </label>
                   <br></br>
                   <label>
                     Password:
-                    <input type="text" value={this.state.signup_password} onChange={this.handleSUPW1Change} />
+                    <input className='input_line' type="password" value={this.state.signup_password} onChange={this.handleSUPW1Change} />
                   </label>
                   <br></br>
                   <label>
                     Re-Enter Password:
-                    <input type="text" value={this.state.signup_password2} onChange={this.handleSUPW2Change} />
+                    <input className='input_line' type="password" value={this.state.signup_password2} onChange={this.handleSUPW2Change} />
                   </label>
                   <br></br>
                   <label>
                     First Name:
-                    <input type="text" value={this.state.signup_fname} onChange={this.handleFNameChange} />
+                    <input className='input_line' type="text" value={this.state.signup_fname} onChange={this.handleFNameChange} />
                   </label>
                   <br></br>
                   <label>
                     Last Name:
-                    <input type="text" value={this.state.signup_lname} onChange={this.handleLNameChange} />
+                    <input className='input_line' type="text" value={this.state.signup_lname} onChange={this.handleLNameChange} />
                   </label>
                   <br></br>
-                  <p>
-                    Sign Up Result: {this.state.signup_result}
-                  </p>
+                  {(this.state.signup_result === 1) &&
+                    <p style={{ color: 'red' }}>
+                      *Signup failed, passwords must match!
+                    </p>
+                  }
+                  {(this.state.signup_result === 2) &&
+                    <p style={{ color: 'red' }}>
+                      *Username already taken!
+                    </p>
+                  }
+                  {(this.state.signup_result === 3) &&
+                    <p style={{ color: 'green' }}>
+                      Signup successful!
+                    </p>
+                  }
                   <input type="submit" value="Sign Up" />
                 </form>
 

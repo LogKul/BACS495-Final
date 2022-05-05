@@ -46,14 +46,13 @@ router.post('/', function (req, res, next) {
   db.collection("users")
     .findOne({ "uname": req.body.uname })
     .then(result => {
-
       if (result !== null) {
-        res.json({ "msg": "Username taken." })
+        res.json({ "msg": 2 })
       }
       else {
         db.collection("users")
           .insertOne(user);
-        res.json({ "msg": "Account created." });
+        res.json({ "msg": 3 });
       }
     })
     .catch(err => {

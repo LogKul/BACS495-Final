@@ -15,6 +15,36 @@ router.get('/all', function (req, res, next) {
     });
 });
 
+router.get('/quserupvotes/:uname', function (req, res, next) {
+  var db = req.app.locals.db;
+  query = {
+    "uname": req.params.uname,
+  }
+  var cursor = db.collection("upvotes").find(query);
+  cursor.toArray()
+    .then(result => {
+      res.json(result);
+    })
+    .catch(err => {
+      console.log('Error: ' + err);
+    });
+});
+
+router.get('/ruserupvotes/:uname', function (req, res, next) {
+  var db = req.app.locals.db;
+  query = {
+    "uname": req.params.uname,
+  }
+  var cursor = db.collection("replyupvotes").find(query);
+  cursor.toArray()
+    .then(result => {
+      res.json(result);
+    })
+    .catch(err => {
+      console.log('Error: ' + err);
+    });
+});
+
 router.post('/', function (req, res, next) {
   const question = {
     "uname": req.body.uname,

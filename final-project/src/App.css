@@ -233,11 +233,12 @@
 
 .question_text {
   font-size: 24pt;
-  line-height: 24px;
+  line-height: 32px;
 }
 
 .question_author {
   font-size: 12pt;
+  line-height: 16px;
   font-style: italic;
   color: rgb(211, 190, 218);
 }
@@ -249,7 +250,6 @@
 }
 
 .upvote_button {
-  background-color: green;
   color: white;
 }
 
@@ -288,12 +288,13 @@
 
 .reply_text {
   font-size: 12pt;
-  line-height: 12px;
+  line-height: 14px;
   overflow-wrap: break-word;
 }
 
 .reply_author {
   font-size: 10pt;
+  line-height: 16px;
   font-style: italic;
   color: rgb(211, 190, 218);
   overflow-wrap: break-word;
@@ -303,4 +304,8 @@
   font-size: 10pt;
   font-style: oblique;
   color: rgb(211, 190, 218);
+}
+
+.input_line {
+  width: 90%;
 }
