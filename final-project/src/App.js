@@ -2,6 +2,7 @@ import logo from './images/DK_Tri.png';
 import './App.css';
 //const { ObjectId, ObjectID } = require('mongodb');deploy
 import Footer from './Footer.js';
+import Header from './Header.js';
 import React from 'react';
 
 class App extends React.Component {
@@ -11,7 +12,7 @@ class App extends React.Component {
     this.state = {
       username: "",
       password: "",
-      login: false,
+      login: 0,
       signup_username: "",
       signup_password: "",
       signup_password2: "",
@@ -44,6 +45,7 @@ class App extends React.Component {
     this.handleReplySubmit = this.handleReplySubmit.bind(this);
     this.handleReplyChange = this.handleReplyChange.bind(this);
     this.handleReplyUpvote = this.handleReplyUpvote.bind(this);
+    this.Logout = this.Logout.bind(this);
 
     fetch(process.env.REACT_APP_API_URL + "/questions/all")
       .then(response => response.json())
@@ -136,12 +138,12 @@ class App extends React.Component {
 
         if (data !== null) {
           this.setState({
-            login: true,
+            login: 2,
           });
         }
         else {
           this.setState({
-            login: false,
+            login: 1,
           });
         }
       });
@@ -238,11 +240,14 @@ class App extends React.Component {
       });
   }
 
-  handleQuestionUpvote(id, upvotes) {
+  handleQuestionUpvote(event) {
+    event.preventDefault();
+
     var config = {
-      'id': id,
-      'upvotes': upvotes + 1,
+      'id': event.target.value,
+      'uname': this.state.username,
     }
+
     fetch(process.env.REACT_APP_API_URL + "/questions/upvote",
       {
         method: 'PATCH',
@@ -253,24 +258,27 @@ class App extends React.Component {
       })
       .then(response => response.json())
       .then(data => {
-        console.log(data.msg)
-      });
+        console.log(data.msg);
 
-    fetch(process.env.REACT_APP_API_URL + "/questions/all")
-      .then(response => response.json())
-      .then(data => {
-        console.log(data)
-        this.setState({
-          questions: data,
-        });
+        fetch(process.env.REACT_APP_API_URL + "/questions/all")
+          .then(response2 => response2.json())
+          .then(data2 => {
+            this.setState({
+              questions: data2,
+            });
+            console.log("FUNNY");
+          });
       });
   }
 
-  handleReplyUpvote(id, upvotes) {
+  handleReplyUpvote(event) {
+    event.preventDefault();
+
     var config = {
-      'id': id,
-      'upvotes': upvotes + 1,
+      'id': event.target.value,
+      'uname': this.state.username,
     }
+
     fetch(process.env.REACT_APP_API_URL + "/questions/reply/upvote",
       {
         method: 'PATCH',
@@ -282,15 +290,16 @@ class App extends React.Component {
       .then(response => response.json())
       .then(data => {
         console.log(data.msg)
-      });
 
-    fetch(process.env.REACT_APP_API_URL + "/questions/replies/all")
-      .then(response => response.json())
-      .then(data => {
-        console.log(data)
-        this.setState({
-          replies: data,
-        });
+        fetch(process.env.REACT_APP_API_URL + "/questions/replies/all")
+          .then(response2 => response2.json())
+          .then(data2 => {
+            console.log(data2)
+            this.setState({
+              replies: data2,
+            });
+            console.log("FUNNY2");
+          });
       });
   }
 
@@ -321,7 +330,16 @@ class App extends React.Component {
           });
         });
 
-      this.handleQuestionRefresh();
+      fetch(process.env.REACT_APP_API_URL + "/questions/replies/all")
+        .then(response => response.json())
+        .then(data => {
+          console.log(data)
+          this.setState({
+            replies: data,
+            reply_input: "",
+            reply_click: false,
+          });
+        });
     }
     else {
       this.setState({
@@ -330,55 +348,37 @@ class App extends React.Component {
     }
   }
 
+  Logout() {
+    this.setState({
+      login: 0,
+      username: "",
+      password: "",
+      reply_click: false,
+    })
+  }
+
 
 
   render() {
     return (
       <div>
-        <div className='Header'>
-          {/*<Header />*/}
-          <div>
-
-            <div className="headerContent">
-              <div className='flexPropHeader'></div>
-              <div className="flexHeader"><h1>[ Header ]</h1></div>
-              <div className='flexProfile'>Welcome, new user! <button>Sign in (just for looks)</button>{/*<img src={pfp} className='pfp' alt='pfp'></img>*/}</div>
-            </div>
-
-            <div className="nav_container">
-              <div className="flex_content">Option 1</div>
-              <div className="flex_content">Option 2</div>
-              <div className="flex_content">Option 3</div>
-              <div className="flex_content">Option 4</div>
-              <div className="flex_content">Option 5</div>
-              <div className="flex_content">Option 6</div>
-            </div>
-
-          </div>
-        </div>
+        <Header />
         <div className="App-container">
-          <div className='App-child-classnav App-child'>
-            {this.state.replies.map(r =>
-              <div className='question'>
-                <p className='question_author'>Posted by {r.uname}</p>
-                <p className='question_author'>QID: {r.qid}</p>
-                <p className='question_text'>{r.text}</p>
-                <p className='question_votes'>Upvotes: {r.upvotes}</p>
-              </div>
-            )}
-          </div>
           <div className='App-child-maincontent App-child'>
-
-            <form onSubmit={this.handleQuestionSubmit} className='question_input'>
-              <p>Submit a Question:</p>
-              <label>
-                <textarea placeholder='Enter a question here!' value={this.state.question_input} onChange={this.handleQuestionChange} className='question_input_area'></textarea>
-              </label>
-              <br></br>
-              <input type="submit" value="Submit" />
-            </form>
-            <p>{this.state.question_result}</p>
-            <hr></hr>
+            {(this.state.login === 2) &&
+              <div>
+                <form onSubmit={this.handleQuestionSubmit} className='question_input'>
+                  <p>Submit a Question:</p>
+                  <label>
+                    <textarea placeholder='Enter a question here!' value={this.state.question_input} onChange={this.handleQuestionChange} className='question_input_area'></textarea>
+                  </label>
+                  <br></br>
+                  <input type="submit" value="Submit" />
+                </form>
+                <p>{this.state.question_result}</p>
+                <hr></hr>
+              </div>
+            }
 
             <br></br>
 
@@ -389,11 +389,13 @@ class App extends React.Component {
                   <p className='question_author'>QID: {q._id}</p>
                   <p className='question_text'>{q.question} {q.text}</p>
                   <p className='question_votes'>Upvotes: {q.upvotes}</p>
-                  <button className='upvote_button' value={q.upvotes} onClick={() => this.handleQuestionUpvote(q._id, q.upvotes)}>Upvote</button>
+                  {(this.state.login === 2) &&
+                    <button className='upvote_button' value={q._id} onClick={this.handleQuestionUpvote}>Upvote</button>
+                  }
                   <p></p>
                   <button className='reply_button' onClick={() => this.handleReplyClick(q._id)}>Reply</button>
                 </div>
-                {(this.state.reply_click === true && this.state.reply_question_id === q._id && this.state.login === true) &&
+                {(this.state.reply_click === true && this.state.reply_question_id === q._id && this.state.login === 2) &&
                   <div>
                     <form onSubmit={this.handleReplySubmit} className='reply_input'>
                       <label>
@@ -410,93 +412,112 @@ class App extends React.Component {
                     <p className='reply_author'>Reply from {r.uname}</p>
                     <p className='reply_text'>{r.text}</p>
                     <p className='reply_votes'>Upvotes: {r.upvotes}</p>
-                    <button className='upvote_button' value={r.upvotes} onClick={() => this.handleReplyUpvote(r._id, r.upvotes)}>Upvote</button>
+                    {(this.state.login === 2) &&
+                      <button className='upvote_button' value={r._id} onClick={this.handleReplyUpvote}>Upvote</button>
+                    }
                   </div>
                 )}
               </div>)
             }
 
+            <br></br>
+            <br></br>
+
           </div>
           <div className='App-child-somethingelse App-child'>
-            Maybe some options/settings/actions over here? Or it could be a news section.
 
-            <br></br>
-            <br></br>
+            {!(this.state.login === 2)
+              ?
+              <div>
+                {(this.state.login) === 1 &&
+                  <div>
+                    <div className='Testbox'>
+                      Login failed, try again.
+                      <br></br>
+                    </div>
+                    <br></br>
+                    <br></br>
+                  </div>
+                }
 
-            <form onSubmit={this.handleLoginSubmit} className='Loginform'>
-              Login
-              <br></br>
-              <br></br>
-              <label>
-                Username:
-                <input type="text" value={this.state.username} onChange={this.handleUNChange} />
-              </label>
-              <br></br>
-              <label>
-                Password:
-                <input type="text" value={this.state.password} onChange={this.handlePWChange} />
-              </label>
-              <br></br>
-              <input type="submit" value="Sign In" />
-            </form>
+                <form onSubmit={this.handleLoginSubmit} className='Loginform'>
+                  Login
+                  <br></br>
+                  <br></br>
+                  <label>
+                    Username:
+                    <input type="text" value={this.state.username} onChange={this.handleUNChange} />
+                  </label>
+                  <br></br>
+                  <label>
+                    Password:
+                    <input type="password" value={this.state.password} onChange={this.handlePWChange} />
+                  </label>
+                  <br></br>
+                  <input type="submit" value="Sign In" />
+                </form>
 
-            <br></br>
-            <br></br>
+                <br></br>
+                <br></br>
 
-            <div className="Testbox">
-              <p>Login State: {this.state.login ? "Successfully logged in!" : "Not logged in."}</p>
-            </div>
+                <form onSubmit={this.handleSignUpSubmit} className='Loginform'>
+                  Sign Up
+                  <br></br>
+                  <br></br>
+                  <label>
+                    Username:
+                    <input type="text" value={this.state.signup_username} onChange={this.handleSUUNChange} />
+                  </label>
+                  <br></br>
+                  <label>
+                    Password:
+                    <input type="text" value={this.state.signup_password} onChange={this.handleSUPW1Change} />
+                  </label>
+                  <br></br>
+                  <label>
+                    Re-Enter Password:
+                    <input type="text" value={this.state.signup_password2} onChange={this.handleSUPW2Change} />
+                  </label>
+                  <br></br>
+                  <label>
+                    First Name:
+                    <input type="text" value={this.state.signup_fname} onChange={this.handleFNameChange} />
+                  </label>
+                  <br></br>
+                  <label>
+                    Last Name:
+                    <input type="text" value={this.state.signup_lname} onChange={this.handleLNameChange} />
+                  </label>
+                  <br></br>
+                  <p>
+                    Sign Up Result: {this.state.signup_result}
+                  </p>
+                  <input type="submit" value="Sign Up" />
+                </form>
 
-            <br></br>
-            <br></br>
+                <br></br>
+                <br></br>
 
-            <div className="Infotestbox">
-              <p>Here are 2 accounts to test with:</p>
-              <br></br>
-              <p>Username: larryspringus123</p>
-              <p>Password: password1</p>
-              <br></br>
-              <p>Username: jimbocrusher</p>
-              <p>Password: creg4lyfe</p>
-            </div>
+                <div className="Infotestbox">
+                  <p>Here are 2 accounts to test with:</p>
+                  <br></br>
+                  <p>Username: larryspringus123</p>
+                  <p>Password: password1</p>
+                  <br></br>
+                  <p>Username: jimbocrusher</p>
+                  <p>Password: creg4lyfe</p>
+                </div>
 
-            <br></br>
-            <br></br>
 
-            <form onSubmit={this.handleSignUpSubmit} className='Loginform'>
-              Sign Up
-              <br></br>
-              <br></br>
-              <label>
-                Username:
-                <input type="text" value={this.state.signup_username} onChange={this.handleSUUNChange} />
-              </label>
-              <br></br>
-              <label>
-                Password:
-                <input type="text" value={this.state.signup_password} onChange={this.handleSUPW1Change} />
-              </label>
-              <br></br>
-              <label>
-                Re-Enter Password:
-                <input type="text" value={this.state.signup_password2} onChange={this.handleSUPW2Change} />
-              </label>
-              <br></br>
-              <label>
-                First Name:
-                <input type="text" value={this.state.signup_fname} onChange={this.handleFNameChange} />
-              </label>
-              <br></br>
-              <label>
-                Last Name:
-                <input type="text" value={this.state.signup_lname} onChange={this.handleLNameChange} />
-              </label>
-              <br></br>
-              <p>
-                Sign Up Result: {this.state.signup_result}
-              </p>
-              <input type="submit" value="Sign Up" />
-            </form>
+              </div>
+              :
+              <div className='Testbox'>
+                Logged in as {this.state.username}.
+                <br></br>
+                <br></br>
+                <button onClick={() => this.Logout()}>Logout</button>
+              </div>
+            }
           </div>
         </div>
         <Footer />

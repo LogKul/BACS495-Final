@@ -35,17 +35,46 @@ router.post('/', function (req, res, next) {
 });
 
 router.patch('/upvote', function (req, res, next) {
-  const question = {
+  const upvote = {
     "_id": ObjectId(req.body.id),
+    "uname": req.body.uname
   };
   var db = req.app.locals.db;
 
-  db.collection("questions")
-    .updateOne(question, { $set: { "upvotes": req.body.upvotes } }, { upsert: true })
-    .catch(err => {
-      console.log('Error: ' + err);
-    });
-  res.json({ "msg": "Question " + req.body.id + " now has " + req.body.upvotes + " upvotes." });
+  db.collection("upvotes")
+    .find(upvote)
+    .toArray()
+    .then(result => {
+      if (result.length === 0) {
+        db.collection("upvotes")
+          .insertOne(upvote)
+          .then(result => {
+            console.log("Upvote posted")
+          })
+          .catch(err => {
+            console.log('Error: ' + err);
+          });
+
+        db.collection("questions")
+          .findOne({ "_id": ObjectId(req.body.id) })
+          .then(result => {
+            var total_question_upvotes = result.upvotes;
+            total_question_upvotes = total_question_upvotes + 1;
+            console.log(total_question_upvotes);
+
+            db.collection("questions")
+              .updateOne({ "_id": ObjectId(req.body.id) }, { $set: { "upvotes": total_question_upvotes } }, { upsert: true })
+              .catch(err => {
+                console.log('Error: ' + err);
+              });
+          })
+        res.json({ "msg": "Upvote posted." });
+      }
+      else {
+        console.log("Upvote failed.");
+        res.json({ "msg": "Upvote failed." })
+      }
+    })
 });
 
 router.delete('/user', function (req, res, next) {
@@ -113,18 +142,92 @@ router.post('/reply', function (req, res, next) {
     });
 });
 
-router.patch('/reply/upvote', function (req, res, next) {
-  const reply = {
+/*
+router.patch('/upvote', function (req, res, next) {
+  const upvote = {
     "_id": ObjectId(req.body.id),
+    "uname": req.body.uname
   };
   var db = req.app.locals.db;
 
-  db.collection("replies")
-    .updateOne(reply, { $set: { "upvotes": req.body.upvotes } }, { upsert: true })
-    .catch(err => {
-      console.log('Error: ' + err);
-    });
-  res.json({ "msg": "Reply " + req.body.id + " now has " + req.body.upvotes + " upvotes." });
+  db.collection("upvotes")
+    .find(upvote)
+    .toArray()
+    .then(result => {
+      if (result.length === 0) {
+        db.collection("upvotes")
+          .insertOne(upvote)
+          .then(result => {
+            console.log("Upvote posted")
+          })
+          .catch(err => {
+            console.log('Error: ' + err);
+          });
+
+        db.collection("questions")
+          .findOne({ "_id": ObjectId(req.body.id) })
+          .then(result => {
+            var total_question_upvotes = result.upvotes;
+            total_question_upvotes = total_question_upvotes + 1;
+            console.log(total_question_upvotes);
+
+            db.collection("questions")
+              .updateOne({ "_id": ObjectId(req.body.id) }, { $set: { "upvotes": total_question_upvotes } }, { upsert: true })
+              .catch(err => {
+                console.log('Error: ' + err);
+              });
+          })
+        res.json({ "msg": "Upvote posted." });
+      }
+      else {
+        console.log("Upvote failed.");
+        res.json({ "msg": "Upvote failed." })
+      }
+    })
+});
+*/
+
+router.patch('/reply/upvote', function (req, res, next) {
+  const upvote = {
+    "_id": ObjectId(req.body.id),
+    "uname": req.body.uname
+  };
+  var db = req.app.locals.db;
+
+  db.collection("replyupvotes")
+    .find(upvote)
+    .toArray()
+    .then(result => {
+      if (result.length === 0) {
+        db.collection("replyupvotes")
+          .insertOne(upvote)
+          .then(result => {
+            console.log("Reply upvote posted")
+          })
+          .catch(err => {
+            console.log('Error: ' + err);
+          });
+
+        db.collection("replies")
+          .findOne({ "_id": ObjectId(req.body.id) })
+          .then(result => {
+            var total_reply_upvotes = result.upvotes;
+            total_reply_upvotes = total_reply_upvotes + 1;
+            console.log(total_reply_upvotes);
+
+            db.collection("replies")
+              .updateOne({ "_id": ObjectId(req.body.id) }, { $set: { "upvotes": total_reply_upvotes } }, { upsert: true })
+              .catch(err => {
+                console.log('Error: ' + err);
+              });
+          })
+        res.json({ "msg": "Reply upvote posted." });
+      }
+      else {
+        console.log("Reply upvote failed.");
+        res.json({ "msg": "Reply upvote failed." })
+      }
+    })
 });
 
 module.exports = router;
